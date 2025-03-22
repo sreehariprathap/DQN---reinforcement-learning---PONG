@@ -8585,26 +8585,42 @@ Best average reward achieved: -19.40
 </li>
 </ul>
 <hr/>
-<h4 id="Training-Results"><strong>Training Results</strong><a class="anchor-link" href="#Training-Results">¶</a></h4><h5 id="1.-Batch-Size:-8,-Target-Update-Frequency:-10"><strong>1. Batch Size: 8, Target Update Frequency: 10</strong><a class="anchor-link" href="#1.-Batch-Size:-8,-Target-Update-Frequency:-10">¶</a></h5><ul>
-<li><strong>Final Average Reward (Last 5 Episodes)</strong>: -20.40.</li>
-<li><strong>Best Average Reward Achieved</strong>: -18.80.</li>
-<li><strong>Performance Trend</strong>: The agent's performance improved initially but declined in later episodes. The frequent updates to the target network (every 10 episodes) provided stability but may have slowed adaptation.</li>
-</ul>
-<h5 id="2.-Batch-Size:-16,-Target-Update-Frequency:-10"><strong>2. Batch Size: 16, Target Update Frequency: 10</strong><a class="anchor-link" href="#2.-Batch-Size:-16,-Target-Update-Frequency:-10">¶</a></h5><ul>
-<li><strong>Final Average Reward (Last 5 Episodes)</strong>: -20.00.</li>
-<li><strong>Best Average Reward Achieved</strong>: -20.00.</li>
-<li><strong>Performance Trend</strong>: The larger batch size provided more stable gradients, but the agent's performance remained relatively flat. The less frequent target network updates (every 10 episodes) contributed to slower learning.</li>
-</ul>
-<h5 id="3.-Batch-Size:-8,-Target-Update-Frequency:-3"><strong>3. Batch Size: 8, Target Update Frequency: 3</strong><a class="anchor-link" href="#3.-Batch-Size:-8,-Target-Update-Frequency:-3">¶</a></h5><ul>
-<li><strong>Final Average Reward (Last 5 Episodes)</strong>: -20.80.</li>
-<li><strong>Best Average Reward Achieved</strong>: -19.60.</li>
-<li><strong>Performance Trend</strong>: The agent showed some improvement but struggled with stability due to more frequent target network updates (every 3 episodes). Smaller batch sizes allowed faster learning but introduced more variance.</li>
-</ul>
-<h5 id="4.-Batch-Size:-16,-Target-Update-Frequency:-3"><strong>4. Batch Size: 16, Target Update Frequency: 3</strong><a class="anchor-link" href="#4.-Batch-Size:-16,-Target-Update-Frequency:-3">¶</a></h5><ul>
-<li><strong>Final Average Reward (Last 5 Episodes)</strong>: -19.60.</li>
-<li><strong>Best Average Reward Achieved</strong>: -19.40.</li>
-<li><strong>Performance Trend</strong>: The combination of a larger batch size and more frequent target network updates provided a balance between stability and adaptation. The agent achieved the best performance among all configurations.</li>
-</ul>
+<h4 id="Training-Results"><strong>Training Results</strong><a class="anchor-link" href="#Training-Results">¶</a></h4><table>
+<thead>
+<tr>
+<th><strong>Configuration</strong></th>
+<th><strong>Final Avg Reward (Last 5 Episodes)</strong></th>
+<th><strong>Best Avg Reward</strong></th>
+<th><strong>Performance Trend</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Batch Size: 8, Target Update: 10</strong></td>
+<td>-20.40</td>
+<td>-18.80</td>
+<td>Improved initially but declined later. Frequent updates provided stability but potentially slowed adaptation.</td>
+</tr>
+<tr>
+<td><strong>Batch Size: 16, Target Update: 10</strong></td>
+<td>-20.00</td>
+<td>-20.00</td>
+<td>Larger batch size provided more stable gradients, but performance remained flat. Less frequent target updates contributed to slower learning.</td>
+</tr>
+<tr>
+<td><strong>Batch Size: 8, Target Update: 3</strong></td>
+<td>-20.80</td>
+<td>-19.60</td>
+<td>Showed some improvement but struggled with stability due to more frequent target updates. Smaller batch sizes allowed faster learning but introduced more variance.</td>
+</tr>
+<tr>
+<td><strong>Batch Size: 16, Target Update: 3</strong></td>
+<td>-19.60</td>
+<td>-19.40</td>
+<td>Best overall performance. The combination of larger batch size and more frequent target updates provided a balance between stability and adaptation.</td>
+</tr>
+</tbody>
+</table>
 <hr/>
 <h4 id="Key-Observations"><strong>Key Observations</strong><a class="anchor-link" href="#Key-Observations">¶</a></h4><ol>
 <li><p><strong>Batch Size</strong>:</p>
@@ -8638,7 +8654,39 @@ Best average reward achieved: -19.40
 <li><strong>Batch Size</strong>: 16.</li>
 <li><strong>Target Network Update Frequency</strong>: 3 episodes.</li>
 </ul>
-<p>This configuration provided a balance between stability and adaptation, achieving the highest average reward (-19.60) and the best overall performance.</p>
+<p>From Research, the following recommendations can be made to improve the agent's performance:</p>
+<ol>
+<li><p><strong>Speed Up Training</strong></p>
+<ul>
+<li><strong>Increase Batch Size &amp; Steps</strong>: Train every 4 environment steps with batch sizes of 32–64 for a 47% speedup.</li>
+<li><strong>Parallelize Training &amp; Environment</strong>: Use torch.multiprocessing to run both simultaneously, boosting speed by 74%.</li>
+<li><strong>Async CUDA Transfers</strong>: Enable async=True for faster CPU-GPU data transfer (3.5% speedup).</li>
+</ul>
+</li>
+<li><p><strong>Optimize Environment Preprocessing</strong></p>
+<ul>
+<li><strong>Use Fast Atari Wrappers</strong>: Switch to OpenCV-based wrappers (18% faster).</li>
+<li><strong>Essential Wrappers</strong>: Use EpisodicLifeEnv, FrameStack, and ClippedRewardWrapper for stability and efficiency.</li>
+</ul>
+</li>
+<li><p><strong>Tune Hyperparameters</strong></p>
+<ul>
+<li><strong>Refine Epsilon Decay</strong>: Adjust exploration rates for better learning (e.g., 1.0 → 0.02 over 100k frames).</li>
+<li><strong>Frequent Target Updates</strong>: Sync every 1k frames for stability.</li>
+</ul>
+</li>
+<li><p><strong>Use Advanced DQN Techniques</strong></p>
+<ul>
+<li><strong>Double DQN, PER, Dueling DQN</strong>: Improve efficiency and stability.</li>
+<li><strong>Train Longer</strong>: Process 484 frames/sec to solve Pong in 30 min.</li>
+</ul>
+</li>
+<li><p><strong>Maximize GPU Utilization</strong></p>
+<ul>
+<li>Optimize batch sizes, parallel tasks, and scale to tougher Atari games.</li>
+</ul>
+</li>
+</ol>
 <hr/>
 <h4 id="Conclusion"><strong>Conclusion</strong><a class="anchor-link" href="#Conclusion">¶</a></h4><p>The DQN agent demonstrated the ability to learn from raw pixel inputs in the Pong environment. However, the agent's performance was limited, and further improvements could be achieved by:</p>
 <ul>
